@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Prompt Supervisor | AI Governance Control Plane</title>
+  <meta name="description" content="Prompt Supervisor supervises prompts, responses, model routes, and agent actions before they create risk in real workflows.">
+  <link rel="canonical" href="https://promptsupervisor.com/">
+  <meta property="og:title" content="Prompt Supervisor">
+  <meta property="og:description" content="AI governance control plane for prompt supervision, safe rewrites, agent approvals, and audit evidence.">
+  <meta property="og:url" content="https://promptsupervisor.com/">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f6f7f9;
+      --surface: #fff;
+      --ink: #172033;
+      --muted: #5d6678;
+      --line: #d9dee7;
+      --blue: #2554d8;
+      --blue-dark: #153caa;
+      --green: #147a52;
+      --soft-blue: #eef4ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    a { color: inherit; text-decoration: none; }
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 14px clamp(18px, 4vw, 42px);
+      background: rgba(255,255,255,.94);
+      border-bottom: 1px solid var(--line);
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+    }
+    .mark {
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      font-weight: 900;
+    }
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    nav a {
+      padding: 9px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    nav a:hover { background: #eef2f7; color: var(--ink); }
+    .hero {
+      min-height: min(760px, calc(100vh - 84px));
+      display: flex;
+      align-items: center;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.84) 48%, rgba(240,253,250,.76) 100%),
+        url("https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1800&q=80");
+      background-size: cover;
+      background-position: center;
+      border-bottom: 1px solid var(--line);
+    }
+    .shell {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(320px, .72fr);
+      gap: 48px;
+      align-items: center;
+      padding: 48px 0;
+    }
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--blue-dark);
+      text-transform: uppercase;
+      letter-spacing: 0;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    h1 {
+      max-width: 760px;
+      margin: 0;
+      font-size: clamp(46px, 7vw, 86px);
+      letter-spacing: 0;
+      line-height: 1;
+    }
+    .hero-copy p:not(.eyebrow) {
+      max-width: 680px;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.65;
+    }
+    .button-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-weight: 800;
+    }
+    .button.primary { color: #fff; background: var(--blue); border-color: var(--blue); }
+    .button.secondary { color: var(--ink); background: #fff; border-color: var(--line); }
+    .panel {
+      display: grid;
+      gap: 0;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 18px 42px rgba(15,23,42,.12);
+      padding: 18px;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 0 12px;
+      margin-bottom: 12px;
+    }
+    .step:last-child { border-bottom: 0; padding-bottom: 0; margin-bottom: 0; }
+    .step span { color: var(--muted); font-weight: 900; }
+    .step strong { font-size: 20px; }
+    .section {
+      padding: 34px 0;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .section h2 {
+      margin: 0 0 18px;
+      font-size: clamp(28px, 4vw, 42px);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+    article {
+      min-height: 140px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: white;
+      padding: 16px;
+    }
+    article h3 { margin: 0 0 8px; font-size: 18px; }
+    article p { margin: 0; color: var(--muted); line-height: 1.45; font-size: 14px; }
+    footer {
+      padding: 26px 0;
+      color: var(--muted);
+      background: #fff;
+    }
+    @media (max-width: 840px) {
+      .site-header { align-items: flex-start; flex-direction: column; }
+      nav { justify-content: flex-start; }
+      .hero-grid, .grid { grid-template-columns: 1fr; }
+      .hero { min-height: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">
+      <span class="mark">PS</span>
+      <span>Prompt Supervisor</span>
+    </a>
+    <nav aria-label="Primary navigation">
+      <a href="#modules">Modules</a>
+      <a href="#rollout">Rollout</a>
+      <a href="https://github.com/supercomputerconsultingllc-prog/PromptSupervisor">Repository</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="shell hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">AI firewall + agent governance</p>
+          <h1>Prompt Supervisor</h1>
+          <p>
+            A control plane for supervising prompts, responses, model routes, and agent actions
+            before they create risk in the real workflow.
+          </p>
+          <div class="button-row">
+            <a class="button primary" href="#modules">View modules</a>
+            <a class="button secondary" href="https://github.com/supercomputerconsultingllc-prog/PromptSupervisor">View source</a>
+          </div>
+        </div>
+        <aside class="panel" aria-label="Prompt Supervisor decision path">
+          <div class="step"><span>Policy inspection</span><strong>Live</strong></div>
+          <div class="step"><span>Safe rewrite</span><strong>Ready</strong></div>
+          <div class="step"><span>Approval route</span><strong>Gated</strong></div>
+          <div class="step"><span>Audit event</span><strong>Logged</strong></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="modules" class="section">
+      <div class="shell">
+        <p class="eyebrow">Production model</p>
+        <h2>Control Plane Modules</h2>
+        <div class="grid">
+          <article><h3>Prompt firewall</h3><p>Detect injection, jailbreak, RAG, URL, malware, and secret exposure before model execution.</p></article>
+          <article><h3>Prompt enhancer</h3><p>Rewrite risky prompts into policy-safe, minimized, role-appropriate requests.</p></article>
+          <article><h3>Agent supervisor</h3><p>Score tool-call risk, reversibility, user intent, and required approval boundaries.</p></article>
+          <article><h3>Audit layer</h3><p>Normalize events, policy hits, risk dimensions, and compliance evidence for review.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="rollout" class="section">
+      <div class="shell">
+        <p class="eyebrow">Deployment posture</p>
+        <h2>Ready for governed rollout</h2>
+        <div class="grid">
+          <article><h3>Customer controls</h3><p>Bring your own model endpoint, policy set, and approval process.</p></article>
+          <article><h3>Evidence exports</h3><p>Keep decision trails usable for compliance review and incident follow-up.</p></article>
+          <article><h3>Production posture</h3><p>Public website loads directly from the owned domain without an external proxy dependency.</p></article>
+          <article><h3>Operator workflow</h3><p>Route blocked actions to review instead of hiding the decision path.</p></article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">Prompt Supervisor by Supercomputer Consulting LLC.</div>
+  </footer>
+</body>
+</html>
