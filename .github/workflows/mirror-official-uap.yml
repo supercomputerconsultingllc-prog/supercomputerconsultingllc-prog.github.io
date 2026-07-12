@@ -16,7 +16,7 @@ permissions:
 
 concurrency:
   group: official-uap-mirror
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   mirror:
@@ -29,6 +29,32 @@ jobs:
     steps:
       - name: Check out archive repository
         uses: actions/checkout@v4
+
+      - name: Publish running status
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          payload = {
+              "status": "running",
+              "workflow_outcome": None,
+              "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+              "release_tag": os.environ["RELEASE_TAG"],
+              "release_url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/releases/tag/{os.environ['RELEASE_TAG']}",
+              "workflow_run_url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              "commit": os.environ["GITHUB_SHA"],
+          }
+          with open("status.json", "w", encoding="utf-8") as fh:
+              json.dump(payload, fh, indent=2)
+              fh.write("\n")
+          PY
+          CONTENT=$(base64 -w0 status.json)
+          EXISTING_SHA=$(gh api "repos/$GITHUB_REPOSITORY/contents/uap-archive/status.json" --jq .sha 2>/dev/null || true)
+          ARGS=(-f message="Mark UAP archive collection running [skip ci]" -f content="$CONTENT" -f branch="main")
+          if [ -n "$EXISTING_SHA" ]; then
+            ARGS+=(-f sha="$EXISTING_SHA")
+          fi
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/uap-archive/status.json" "${ARGS[@]}"
 
       - name: Reclaim runner disk space
         run: |
@@ -43,7 +69,7 @@ jobs:
         continue-on-error: true
         run: python3 uap-archive/mirror_official_uap.py
 
-      - name: Publish machine-readable run status
+      - name: Publish machine-readable final status
         if: always()
         env:
           COLLECT_OUTCOME: ${{ steps.collect.outcome }}
