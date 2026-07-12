@@ -38,8 +38,49 @@ jobs:
         run: python3 -m pip install --disable-pip-version-check beautifulsoup4
 
       - name: Mirror and catalog official files
+        id: collect
+        continue-on-error: true
         run: python3 uap-archive/mirror_official_uap.py
+
+      - name: Publish machine-readable run status
+        if: always()
+        env:
+          COLLECT_OUTCOME: ${{ steps.collect.outcome }}
+        run: |
+          if [ "$COLLECT_OUTCOME" = "success" ]; then
+            PUBLIC_STATUS="completed"
+          else
+            PUBLIC_STATUS="failed"
+          fi
+          python3 - <<'PY'
+          import json, os
+          from datetime import datetime, timezone
+          payload = {
+              "status": os.environ["PUBLIC_STATUS"],
+              "workflow_outcome": os.environ["COLLECT_OUTCOME"],
+              "updated_at_utc": datetime.now(timezone.utc).isoformat(),
+              "release_tag": os.environ["RELEASE_TAG"],
+              "release_url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/releases/tag/{os.environ['RELEASE_TAG']}",
+              "workflow_run_url": f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+              "commit": os.environ["GITHUB_SHA"],
+          }
+          with open("status.json", "w", encoding="utf-8") as fh:
+              json.dump(payload, fh, indent=2)
+              fh.write("\n")
+          PY
+          export PUBLIC_STATUS
+          CONTENT=$(base64 -w0 status.json)
+          EXISTING_SHA=$(gh api "repos/$GITHUB_REPOSITORY/contents/uap-archive/status.json" --jq .sha 2>/dev/null || true)
+          ARGS=(-f message="Update UAP archive status [skip ci]" -f content="$CONTENT" -f branch="main")
+          if [ -n "$EXISTING_SHA" ]; then
+            ARGS+=(-f sha="$EXISTING_SHA")
+          fi
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/uap-archive/status.json" "${ARGS[@]}"
 
       - name: Show resulting release
         if: always()
         run: gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" || true
+
+      - name: Fail workflow if collection failed
+        if: steps.collect.outcome != 'success'
+        run: exit 1
