@@ -1,0 +1,44 @@
+name: Mirror official UAP releases
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "uap-archive/mirror_official_uap.py"
+      - ".github/workflows/mirror-official-uap.yml"
+  schedule:
+    - cron: "17 9 * * 1"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: official-uap-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: official-uap-archive-2026-07-11
+    steps:
+      - name: Check out archive repository
+        uses: actions/checkout@v4
+
+      - name: Reclaim runner disk space
+        run: |
+          sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc || true
+          df -h /
+
+      - name: Install collector dependency
+        run: python3 -m pip install --disable-pip-version-check beautifulsoup4
+
+      - name: Mirror and catalog official files
+        run: python3 uap-archive/mirror_official_uap.py
+
+      - name: Show resulting release
+        if: always()
+        run: gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" || true
