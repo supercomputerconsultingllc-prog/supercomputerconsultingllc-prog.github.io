@@ -52,6 +52,7 @@ jobs:
           else
             PUBLIC_STATUS="failed"
           fi
+          export PUBLIC_STATUS
           python3 - <<'PY'
           import json, os
           from datetime import datetime, timezone
@@ -68,7 +69,6 @@ jobs:
               json.dump(payload, fh, indent=2)
               fh.write("\n")
           PY
-          export PUBLIC_STATUS
           CONTENT=$(base64 -w0 status.json)
           EXISTING_SHA=$(gh api "repos/$GITHUB_REPOSITORY/contents/uap-archive/status.json" --jq .sha 2>/dev/null || true)
           ARGS=(-f message="Update UAP archive status [skip ci]" -f content="$CONTENT" -f branch="main")
