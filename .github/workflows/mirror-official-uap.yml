@@ -24,6 +24,7 @@ jobs:
     timeout-minutes: 360
     env:
       GH_TOKEN: ${{ github.token }}
+      GH_REPOSITORY: ${{ github.repository }}
       RELEASE_TAG: official-uap-archive-2026-07-11
     steps:
       - name: Check out archive repository
