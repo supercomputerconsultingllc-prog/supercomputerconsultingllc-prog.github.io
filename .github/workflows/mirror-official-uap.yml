@@ -1,11 +1,12 @@
 name: Mirror official UAP releases
+run-name: Mirror official UAP releases and refresh public catalog
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths:
-      - "uap-archive/mirror_official_uap.py"
+      - "uap-archive/**"
       - ".github/workflows/mirror-official-uap.yml"
   schedule:
     - cron: "17 9 * * 1"
