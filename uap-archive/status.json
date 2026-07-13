@@ -1,7 +1,7 @@
 {
-  "status": "running",
-  "workflow_outcome": null,
-  "updated_at_utc": "2026-07-13T12:17:52.582669+00:00",
+  "status": "failed",
+  "workflow_outcome": "failure",
+  "updated_at_utc": "2026-07-13T12:19:40.491644+00:00",
   "release_tag": "official-uap-archive-2026-07-11",
   "release_url": "https://github.com/supercomputerconsultingllc-prog/supercomputerconsultingllc-prog.github.io/releases/tag/official-uap-archive-2026-07-11",
   "workflow_run_url": "https://github.com/supercomputerconsultingllc-prog/supercomputerconsultingllc-prog.github.io/actions/runs/29249322276",
