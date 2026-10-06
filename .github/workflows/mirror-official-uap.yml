@@ -8,8 +8,11 @@ on:
     paths:
       - "uap-archive/**"
       - ".github/workflows/mirror-official-uap.yml"
-  schedule:
-    - cron: "17 9 * * 1"
+  # NOTE: weekly schedule disabled 2026-10-05 — upstream war.gov bundle URL
+  # returns HTTP 403, so scheduled runs only fail and send weekly failure
+  # emails. Re-enable the cron below once the source is reachable again.
+  # schedule:
+  #   - cron: "17 9 * * 1"
 
 permissions:
   contents: write
